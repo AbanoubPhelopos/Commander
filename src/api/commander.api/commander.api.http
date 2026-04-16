@@ -1,6 +1,6 @@
-@api_Host = https://localhost:7142
+@baseUrl = https://localhost:7142
 
-GET {{api_Host}}/weatherforecast/
+GET {{baseUrl}}/platforms
 Accept: application/json
 
 ###
