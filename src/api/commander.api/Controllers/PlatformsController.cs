@@ -1,27 +1,30 @@
-using commander.domain.Entities;
-using commander.infrastructure.Persistence;
+using commander.application.Features.Platforms.Commands.Create;
+using commander.application.Features.Platforms.Commands.Delete;
+using commander.application.Features.Platforms.Commands.Update;
+using commander.application.Features.Platforms.Queries.GetAll;
+using commander.application.Features.Platforms.Queries.GetById;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Commander.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PlatformsController(AppDbContext context) : ControllerBase
+public class PlatformsController(IMediator mediator) : ControllerBase
 {
-    private readonly AppDbContext _context = context;
+    private readonly IMediator _mediator = mediator;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Platform>>> GetPlatforms(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<object>>> GetPlatforms(CancellationToken cancellationToken)
     {
-        List<Platform> platforms = await _context.Platforms.ToListAsync(cancellationToken);
+        IEnumerable<object> platforms = await _mediator.Send(new GetAllPlatformsQuery(), cancellationToken);
         return Ok(platforms);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Platform>> GetPlatformById(int id, CancellationToken cancellationToken)
+    public async Task<ActionResult<object>> GetPlatformById(int id, CancellationToken cancellationToken)
     {
-        Platform? platform = await _context.Platforms.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+        object? platform = await _mediator.Send(new GetPlatformByIdQuery(id), cancellationToken);
 
         if (platform is null)
         {
@@ -32,50 +35,46 @@ public class PlatformsController(AppDbContext context) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Platform>> CreatePlatform([FromBody] Platform platform, CancellationToken cancellationToken)
+    public async Task<ActionResult<object>> CreatePlatform([FromBody] CreatePlatformCommand command, CancellationToken cancellationToken)
     {
-        if (platform is null)
+        if (string.IsNullOrWhiteSpace(command.PlatformName))
         {
-            return BadRequest("Platform can not be null");
+            return BadRequest("Platform name cannot be null or empty");
         }
 
-        _context.Platforms.Add(platform);
-        await _context.SaveChangesAsync(cancellationToken);
-        return CreatedAtAction(nameof(GetPlatformById), new { id = platform.Id }, platform);
+        object platform = await _mediator.Send(command, cancellationToken);
+        return CreatedAtAction(nameof(GetPlatformById), new { id = ((dynamic)platform).Id }, platform);
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<Platform>> UpdatePlatform(int id, [FromBody] Platform platform, CancellationToken cancellationToken)
+    public async Task<ActionResult<object>> UpdatePlatform(int id, [FromBody] UpdatePlatformCommand command, CancellationToken cancellationToken)
     {
-        Platform? platformFromContext = await _context.Platforms.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+        if (string.IsNullOrWhiteSpace(command.PlatformName))
+        {
+            return BadRequest("Platform name cannot be null or empty");
+        }
 
-        if (platformFromContext is null)
+        UpdatePlatformCommand updateCommand = new(id, command.PlatformName);
+        object? platform = await _mediator.Send(updateCommand, cancellationToken);
+
+        if (platform is null)
         {
             return NotFound($"Platform with ID {id} not found");
         }
 
-        if (platform is null)
-        {
-            return BadRequest("Platform can not be null");
-        }
-
-        platformFromContext.PlatformName = platform.PlatformName;
-        await _context.SaveChangesAsync(cancellationToken);
         return NoContent();
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<Platform>> DeletePlatform(int id, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeletePlatform(int id, CancellationToken cancellationToken)
     {
-        Platform? platformFromContext = await _context.Platforms.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+        bool deleted = await _mediator.Send(new DeletePlatformCommand(id), cancellationToken);
 
-        if (platformFromContext is null)
+        if (!deleted)
         {
             return NotFound($"Platform with ID {id} not found");
         }
 
-        _context.Platforms.Remove(platformFromContext);
-        await _context.SaveChangesAsync(cancellationToken);
         return NoContent();
     }
 }
