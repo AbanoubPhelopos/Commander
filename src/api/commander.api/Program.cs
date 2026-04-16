@@ -1,21 +1,20 @@
-using commander.infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
-using Npgsql;
+using Commander.Api.Registrations;
+using commander.application.Features.Platforms.Commands.Create;
+using commander.application.Features.Platforms.Queries.GetAll;
+
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-var connectionString = new NpgsqlConnectionStringBuilder
-{
-    ConnectionString = builder.Configuration.GetConnectionString("PostgreSqlConnection"),
-    Username = builder.Configuration["DbUserId"],
-    Password = builder.Configuration["DbPassword"]
-};
-
-builder.Services.AddDbContext<AppDbContext>(options =>    
-  options.UseNpgsql(connectionString.ConnectionString));
-
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(CreatePlatformCommand).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(GetAllPlatformsQuery).Assembly);
+});
+
+builder.Services.AddDependencies(builder.Configuration);
 
 WebApplication app = builder.Build();
 
@@ -30,4 +29,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-await app.RunAsync().ConfigureAwait(false);
+await app.RunAsync();
