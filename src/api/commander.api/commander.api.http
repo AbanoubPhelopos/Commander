@@ -4,3 +4,24 @@ GET {{baseUrl}}/platforms
 Accept: application/json
 
 ###
+
+POST {{baseUrl}}/platforms
+Content-Type: application/json
+
+{
+    "platformName": "Xbox"
+}
+
+###
+
+PUT {{baseUrl}}/platforms/1
+Content-Type: application/json
+
+{
+    "platformName": "Xbox"
+}
+
+###
+
+DELETE {{baseUrl}}/platforms/1
+Accept: application/json
