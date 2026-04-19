@@ -1,6 +1,7 @@
 using commander.application.Features.Platforms.Commands.Create;
 using commander.application.Features.Platforms.Commands.Delete;
 using commander.application.Features.Platforms.Commands.Update;
+using commander.application.Features.Platforms.DTOs;
 using commander.application.Features.Platforms.Queries.GetAll;
 using commander.application.Features.Platforms.Queries.GetById;
 using MediatR;
@@ -15,66 +16,57 @@ public class PlatformsController(IMediator mediator) : ControllerBase
     private readonly IMediator _mediator = mediator;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<object>>> GetPlatforms(CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(IEnumerable<PlatformDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<PlatformDto>>> GetPlatforms(CancellationToken cancellationToken)
     {
-        IEnumerable<object> platforms = await _mediator.Send(new GetAllPlatformsQuery(), cancellationToken);
+        IEnumerable<PlatformDto> platforms = await _mediator.Send(new GetAllPlatformsQuery(), cancellationToken);
         return Ok(platforms);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<object>> GetPlatformById(int id, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(PlatformDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PlatformDto>> GetPlatformById(int id, CancellationToken cancellationToken)
     {
-        object? platform = await _mediator.Send(new GetPlatformByIdQuery(id), cancellationToken);
+        PlatformDto? platform = await _mediator.Send(new GetPlatformByIdQuery(id), cancellationToken);
 
-        if (platform is null)
-        {
-            return NotFound($"Platform with ID {id} not found");
-        }
-
-        return Ok(platform);
+        return platform is null
+            ? NotFound(new ProblemDetails { Status = 404, Title = "Platform not found", Detail = $"Platform with ID {id} not found." })
+            : Ok(platform);
     }
 
     [HttpPost]
-    public async Task<ActionResult<object>> CreatePlatform([FromBody] CreatePlatformCommand command, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(PlatformDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<PlatformDto>> CreatePlatform([FromBody] CreatePlatformCommand command, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(command.PlatformName))
-        {
-            return BadRequest("Platform name cannot be null or empty");
-        }
-
-        object platform = await _mediator.Send(command, cancellationToken);
-        return CreatedAtAction(nameof(GetPlatformById), new { id = ((dynamic)platform).Id }, platform);
+        PlatformDto platform = await _mediator.Send(command, cancellationToken);
+        return CreatedAtAction(nameof(GetPlatformById), new { id = platform.Id }, platform);
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<object>> UpdatePlatform(int id, [FromBody] UpdatePlatformCommand command, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> UpdatePlatform(int id, [FromBody] UpdatePlatformCommand command, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(command.PlatformName))
-        {
-            return BadRequest("Platform name cannot be null or empty");
-        }
+        UpdatePlatformCommand updateCommand = new(id, command.PlatformName, command.CreatedAt);
+        PlatformDto? platform = await _mediator.Send(updateCommand, cancellationToken);
 
-        UpdatePlatformCommand updateCommand = new(id, command.PlatformName);
-        object? platform = await _mediator.Send(updateCommand, cancellationToken);
-
-        if (platform is null)
-        {
-            return NotFound($"Platform with ID {id} not found");
-        }
-
-        return NoContent();
+        return platform is null
+            ? NotFound(new ProblemDetails { Status = 404, Title = "Platform not found", Detail = $"Platform with ID {id} not found." })
+            : NoContent();
     }
 
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> DeletePlatform(int id, CancellationToken cancellationToken)
     {
         bool deleted = await _mediator.Send(new DeletePlatformCommand(id), cancellationToken);
 
-        if (!deleted)
-        {
-            return NotFound($"Platform with ID {id} not found");
-        }
-
-        return NoContent();
+        return !deleted
+            ? NotFound(new ProblemDetails { Status = 404, Title = "Platform not found", Detail = $"Platform with ID {id} not found." })
+            : NoContent();
     }
 }
