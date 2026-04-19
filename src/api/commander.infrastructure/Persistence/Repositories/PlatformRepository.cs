@@ -13,6 +13,12 @@ public class PlatformRepository(AppDbContext context) : IPlatformRepository
         return await _context.Platforms.FindAsync([id], cancellationToken).ConfigureAwait(false);
     }
 
+    public async Task<string?> GetPlatformNameByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await _context.Platforms.Where(p => p.Id == id).Select(p => p.PlatformName)
+                    .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+    }
+
     public async Task<IEnumerable<Platform>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Platforms.ToListAsync(cancellationToken).ConfigureAwait(false);
