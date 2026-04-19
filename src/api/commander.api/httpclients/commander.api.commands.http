@@ -1,0 +1,45 @@
+@baseUrl = http://localhost:5141/api/commands
+
+GET {{baseUrl}}
+Accept: application/json
+
+###
+
+GET {{baseUrl}}/1
+Accept: application/json
+
+###
+
+GET {{baseUrl}}/platform/1
+Accept: application/json
+
+###
+
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+    "platformId": 1,
+    "howTo": "How to create a new project",
+    "commandLine": "dotnet new console -o MyProject"
+}
+
+###
+
+PUT {{baseUrl}}/1
+Content-Type: application/json
+
+{
+    "platformId": 1,
+    "howTo": "How to create a new project.",
+    "commandLine": "dotnet new console -o MyProject"
+}
+
+###
+
+DELETE {{baseUrl}}/1
+Accept: application/json
+
+###
+
+
