@@ -23,8 +23,9 @@ public class GenericRepository<T>(AppDbContext context) : IGenericRepository<T> 
         return entity;
     }
 
-    public Task<T?> UpdateAsync(int id, T entity, CancellationToken cancellationToken = default)
+    public Task<T?> UpdateAsync(T entity, CancellationToken cancellationToken = default)
     {
+        Context.Set<T>().Update(entity);
         return Task.FromResult<T?>(entity);
     }
 
