@@ -14,6 +14,6 @@ public class GetAllPlatformsQueryHandler(IUnitOfWork unitOfWork)
     public async Task<IEnumerable<PlatformDto>> Handle(GetAllPlatformsQuery request, CancellationToken cancellationToken)
     {
         IEnumerable<Platform> platforms = await _unitOfWork.Repository<Platform>().GetAllAsync(cancellationToken);
-        return platforms.Select(p => new PlatformDto(p.Id, p.PlatformName)).ToList();
+        return platforms.Select(p => new PlatformDto(p.Id, p.PlatformName, p.CreatedAt)).ToList();
     }
 }

@@ -5,7 +5,7 @@ using MediatR;
 
 namespace commander.application.Features.Platforms.Commands.Update;
 
-public record UpdatePlatformCommand(int Id, string PlatformName) : IRequest<PlatformDto?>;
+public record UpdatePlatformCommand(int Id, string PlatformName, DateTime CreatedAt) : IRequest<PlatformDto?>;
 
 public class UpdatePlatformCommandHandler(IUnitOfWork unitOfWork)
     : IRequestHandler<UpdatePlatformCommand, PlatformDto?>
@@ -20,7 +20,8 @@ public class UpdatePlatformCommandHandler(IUnitOfWork unitOfWork)
             return null;
         }
         existing.PlatformName = request.PlatformName;
+        existing.CreatedAt = request.CreatedAt;
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return new PlatformDto(existing.Id, existing.PlatformName);
+        return new PlatformDto(existing.Id, existing.PlatformName, existing.CreatedAt);
     }
 }

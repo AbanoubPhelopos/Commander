@@ -18,9 +18,9 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
             .AddUserSecrets(Assembly.Load("commander.api"), optional: true)
             .Build();
 
-        string connectionStringBase = configuration.GetConnectionString("PostgreSqlConnection") 
+        string connectionStringBase = configuration.GetConnectionString("PostgreSqlConnection")
             ?? "Host=localhost;Port=5432;Database=commandapi;Pooling=true;";
-        
+
         string username = configuration["DbUserId"] ?? "postgres";
         string password = configuration["DbPassword"] ?? throw new InvalidOperationException("DbPassword user secret is not set");
 

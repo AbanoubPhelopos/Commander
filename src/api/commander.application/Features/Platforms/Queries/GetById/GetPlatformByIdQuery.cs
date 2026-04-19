@@ -18,6 +18,6 @@ public class GetPlatformByIdQueryHandler(IUnitOfWork unitOfWork)
         {
             return null;
         }
-        return new PlatformDto(platform.Id, platform.PlatformName);
+        return new PlatformDto(platform.Id, platform.PlatformName, platform.CreatedAt);
     }
 }
