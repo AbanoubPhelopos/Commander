@@ -9,9 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Commander.Api.Controllers;
 
+#pragma warning disable CA1515
 [ApiController]
 [Route("api/[controller]")]
-public class PlatformsController(IMediator mediator) : ControllerBase
+public sealed class PlatformsController(IMediator mediator) : ControllerBase
+#pragma warning restore CA1515
 {
     private readonly IMediator _mediator = mediator;
 
@@ -19,7 +21,7 @@ public class PlatformsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<PlatformDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<PlatformDto>>> GetPlatforms(CancellationToken cancellationToken)
     {
-        IEnumerable<PlatformDto> platforms = await _mediator.Send(new GetAllPlatformsQuery(), cancellationToken);
+        IEnumerable<PlatformDto> platforms = await _mediator.Send(new GetAllPlatformsQuery(), cancellationToken).ConfigureAwait(false);
         return Ok(platforms);
     }
 
@@ -28,7 +30,7 @@ public class PlatformsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PlatformDto>> GetPlatformById(int id, CancellationToken cancellationToken)
     {
-        PlatformDto? platform = await _mediator.Send(new GetPlatformByIdQuery(id), cancellationToken);
+        PlatformDto? platform = await _mediator.Send(new GetPlatformByIdQuery(id), cancellationToken).ConfigureAwait(false);
 
         return platform is null
             ? NotFound(new ProblemDetails { Status = 404, Title = "Platform not found", Detail = $"Platform with ID {id} not found." })
@@ -40,7 +42,7 @@ public class PlatformsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PlatformDto>> CreatePlatform([FromBody] CreatePlatformCommand command, CancellationToken cancellationToken)
     {
-        PlatformDto platform = await _mediator.Send(command, cancellationToken);
+        PlatformDto platform = await _mediator.Send(command, cancellationToken).ConfigureAwait(false);
         return CreatedAtAction(nameof(GetPlatformById), new { id = platform.Id }, platform);
     }
 
@@ -50,8 +52,10 @@ public class PlatformsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> UpdatePlatform(int id, [FromBody] UpdatePlatformCommand command, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(command);
+
         UpdatePlatformCommand updateCommand = new(id, command.PlatformName, command.CreatedAt);
-        PlatformDto? platform = await _mediator.Send(updateCommand, cancellationToken);
+        PlatformDto? platform = await _mediator.Send(updateCommand, cancellationToken).ConfigureAwait(false);
 
         return platform is null
             ? NotFound(new ProblemDetails { Status = 404, Title = "Platform not found", Detail = $"Platform with ID {id} not found." })
@@ -63,7 +67,7 @@ public class PlatformsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> DeletePlatform(int id, CancellationToken cancellationToken)
     {
-        bool deleted = await _mediator.Send(new DeletePlatformCommand(id), cancellationToken);
+        bool deleted = await _mediator.Send(new DeletePlatformCommand(id), cancellationToken).ConfigureAwait(false);
 
         return !deleted
             ? NotFound(new ProblemDetails { Status = 404, Title = "Platform not found", Detail = $"Platform with ID {id} not found." })

@@ -13,7 +13,7 @@ public class GetAllPlatformsQueryHandler(IPlatformRepository platformRepository)
 
     public async Task<IEnumerable<PlatformDto>> Handle(GetAllPlatformsQuery request, CancellationToken cancellationToken)
     {
-        IEnumerable<Platform> platforms = await _platformRepository.GetAllAsync(cancellationToken);
+        IEnumerable<Platform> platforms = await _platformRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
         return platforms.Adapt<IEnumerable<PlatformDto>>();
     }
 }

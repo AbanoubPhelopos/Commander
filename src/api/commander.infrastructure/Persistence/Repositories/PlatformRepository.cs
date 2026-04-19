@@ -10,23 +10,25 @@ public class PlatformRepository(AppDbContext context) : IPlatformRepository
 
     public async Task<Platform?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return await _context.Platforms.FindAsync([id], cancellationToken);
+        return await _context.Platforms.FindAsync([id], cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<IEnumerable<Platform>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.Platforms.ToListAsync(cancellationToken);
+        return await _context.Platforms.ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<Platform> CreateAsync(Platform platform, CancellationToken cancellationToken = default)
     {
-        await _context.Platforms.AddAsync(platform, cancellationToken);
+        await _context.Platforms.AddAsync(platform, cancellationToken).ConfigureAwait(false);
         return platform;
     }
 
     public async Task<Platform?> UpdateAsync(int id, Platform platform, CancellationToken cancellationToken = default)
     {
-        Platform? existing = await _context.Platforms.FindAsync([id], cancellationToken);
+        ArgumentNullException.ThrowIfNull(platform);
+
+        Platform? existing = await _context.Platforms.FindAsync([id], cancellationToken).ConfigureAwait(false);
         if (existing is null)
         {
             return null;
@@ -39,7 +41,7 @@ public class PlatformRepository(AppDbContext context) : IPlatformRepository
 
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
-        Platform? entity = await _context.Platforms.FindAsync([id], cancellationToken);
+        Platform? entity = await _context.Platforms.FindAsync([id], cancellationToken).ConfigureAwait(false);
         if (entity is null)
         {
             return false;

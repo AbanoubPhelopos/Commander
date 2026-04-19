@@ -1,11 +1,16 @@
-@baseUrl = https://localhost:7142
+@baseUrl = http://localhost:5141/api/platforms
 
-GET {{baseUrl}}/platforms
+GET {{baseUrl}}
 Accept: application/json
 
 ###
 
-POST {{baseUrl}}/platforms
+GET {{baseUrl}}/1
+Accept: application/json
+
+###
+
+POST {{baseUrl}}
 Content-Type: application/json
 
 {
@@ -14,14 +19,14 @@ Content-Type: application/json
 
 ###
 
-PUT {{baseUrl}}/platforms/1
+PUT {{baseUrl}}/1
 Content-Type: application/json
 
 {
-    "platformName": "Xbox"
+    "platformName": "Xbox 2"
 }
 
 ###
 
-DELETE {{baseUrl}}/platforms/1
+DELETE {{baseUrl}}/1
 Accept: application/json

@@ -5,21 +5,21 @@ namespace commander.infrastructure.Persistence.Repositories;
 
 public class GenericRepository<T>(AppDbContext context) : IGenericRepository<T> where T : class
 {
-    protected readonly AppDbContext _context = context;
+    protected AppDbContext Context { get; } = context;
 
     public async Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return await _context.Set<T>().FindAsync(new object[] { id }, cancellationToken);
+        return await Context.Set<T>().FindAsync([id], cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.Set<T>().ToListAsync(cancellationToken);
+        return await Context.Set<T>().ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
     {
-        await _context.Set<T>().AddAsync(entity, cancellationToken);
+        await Context.Set<T>().AddAsync(entity, cancellationToken).ConfigureAwait(false);
         return entity;
     }
 
@@ -30,12 +30,12 @@ public class GenericRepository<T>(AppDbContext context) : IGenericRepository<T> 
 
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
-        T? entity = await _context.Set<T>().FindAsync(new object[] { id }, cancellationToken);
+        T? entity = await Context.Set<T>().FindAsync([id], cancellationToken).ConfigureAwait(false);
         if (entity is null)
         {
             return false;
         }
-        _context.Set<T>().Remove(entity);
+        Context.Set<T>().Remove(entity);
         return true;
     }
 }

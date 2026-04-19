@@ -12,9 +12,11 @@ public class CreatePlatformCommandHandler(IUnitOfWork unitOfWork)
 
     public async Task<PlatformDto> Handle(CreatePlatformCommand request, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(request);
+
         Platform platform = new() { PlatformName = request.PlatformName, CreatedAt = DateTime.UtcNow };
-        await _unitOfWork.Repository<Platform>().AddAsync(platform, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.Repository<Platform>().AddAsync(platform, cancellationToken).ConfigureAwait(false);
+        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return new PlatformDto(platform.Id, platform.PlatformName, platform.CreatedAt);
     }
 }

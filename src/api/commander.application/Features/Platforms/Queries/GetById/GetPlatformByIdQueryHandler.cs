@@ -12,7 +12,9 @@ public class GetPlatformByIdQueryHandler(IPlatformRepository platformRepository)
 
     public async Task<PlatformDto?> Handle(GetPlatformByIdQuery request, CancellationToken cancellationToken)
     {
-        commander.domain.Entities.Platform? platform = await _platformRepository.GetByIdAsync(request.Id, cancellationToken);
+        ArgumentNullException.ThrowIfNull(request);
+
+        commander.domain.Entities.Platform? platform = await _platformRepository.GetByIdAsync(request.Id, cancellationToken).ConfigureAwait(false);
         return platform?.Adapt<PlatformDto>();
     }
 }

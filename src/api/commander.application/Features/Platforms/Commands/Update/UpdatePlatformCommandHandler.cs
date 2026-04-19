@@ -13,7 +13,9 @@ public class UpdatePlatformCommandHandler(IPlatformRepository platformRepository
 
     public async Task<PlatformDto?> Handle(UpdatePlatformCommand request, CancellationToken cancellationToken)
     {
-        Platform? existing = await _platformRepository.GetByIdAsync(request.Id, cancellationToken);
+        ArgumentNullException.ThrowIfNull(request);
+
+        Platform? existing = await _platformRepository.GetByIdAsync(request.Id, cancellationToken).ConfigureAwait(false);
         if (existing is null)
         {
             return null;
@@ -21,8 +23,8 @@ public class UpdatePlatformCommandHandler(IPlatformRepository platformRepository
 
         existing.PlatformName = request.PlatformName;
         existing.CreatedAt = request.CreatedAt;
-        _ = await _unitOfWork.Repository<Platform>().UpdateAsync(request.Id, existing, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        _ = await _unitOfWork.Repository<Platform>().UpdateAsync(request.Id, existing, cancellationToken).ConfigureAwait(false);
+        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return new PlatformDto(existing.Id, existing.PlatformName, existing.CreatedAt);
     }
 }

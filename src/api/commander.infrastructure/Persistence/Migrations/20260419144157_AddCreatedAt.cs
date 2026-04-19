@@ -11,6 +11,8 @@ public partial class AddCreatedAt : Migration
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
+        ArgumentNullException.ThrowIfNull(migrationBuilder);
+
         migrationBuilder.AddColumn<DateTime>(
             name: "CreatedAt",
             table: "Platforms",
@@ -22,6 +24,8 @@ public partial class AddCreatedAt : Migration
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
+        ArgumentNullException.ThrowIfNull(migrationBuilder);
+
         migrationBuilder.DropColumn(
             name: "CreatedAt",
             table: "Platforms");

@@ -11,16 +11,18 @@ public class DeletePlatformCommandHandler(IPlatformRepository platformRepository
 
     public async Task<bool> Handle(DeletePlatformCommand request, CancellationToken cancellationToken)
     {
-        bool exists = await _platformRepository.GetByIdAsync(request.Id, cancellationToken) is not null;
+        ArgumentNullException.ThrowIfNull(request);
+
+        bool exists = await _platformRepository.GetByIdAsync(request.Id, cancellationToken).ConfigureAwait(false) is not null;
         if (!exists)
         {
             return false;
         }
 
-        bool deleted = await _unitOfWork.Repository<commander.domain.Entities.Platform>().DeleteAsync(request.Id, cancellationToken);
+        bool deleted = await _unitOfWork.Repository<commander.domain.Entities.Platform>().DeleteAsync(request.Id, cancellationToken).ConfigureAwait(false);
         if (deleted)
         {
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
         return deleted;
     }

@@ -9,12 +9,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Commander.Api.Registrations;
 
-public static class Dependencies
+internal static class Dependencies
 {
-    public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration)
+    internal static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration)
     {
+        string connectionString = configuration.GetConnectionString("DefaultConnection")
+            + ";Username=" + configuration["DbUserId"]
+            + ";Password=" + configuration["DbPassword"];
+
         services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(connectionString));
 
         services.AddScoped<IPlatformRepository, PlatformRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
