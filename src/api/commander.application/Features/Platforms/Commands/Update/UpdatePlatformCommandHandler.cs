@@ -1,6 +1,7 @@
 using commander.application.Features.Platforms.DTOs;
 using commander.domain.Entities;
 using commander.domain.Interfaces;
+using Mapster;
 using MediatR;
 
 namespace commander.application.Features.Platforms.Commands.Update;
@@ -23,8 +24,8 @@ public class UpdatePlatformCommandHandler(IPlatformRepository platformRepository
 
         existing.PlatformName = request.PlatformName;
         existing.CreatedAt = request.CreatedAt;
-        _ = await _unitOfWork.Repository<Platform>().UpdateAsync(request.Id, existing, cancellationToken).ConfigureAwait(false);
+        _ = await _unitOfWork.Repository<Platform>().UpdateAsync(existing, cancellationToken).ConfigureAwait(false);
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        return new PlatformDto(existing.Id, existing.PlatformName, existing.CreatedAt);
+        return existing.Adapt<PlatformDto>();
     }
 }

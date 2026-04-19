@@ -1,6 +1,7 @@
 using commander.application.Features.Platforms.DTOs;
 using commander.domain.Entities;
 using commander.domain.Interfaces;
+using Mapster;
 using MediatR;
 
 namespace commander.application.Features.Platforms.Commands.Create;
@@ -17,6 +18,6 @@ public class CreatePlatformCommandHandler(IUnitOfWork unitOfWork)
         Platform platform = new() { PlatformName = request.PlatformName, CreatedAt = DateTime.UtcNow };
         await _unitOfWork.Repository<Platform>().AddAsync(platform, cancellationToken).ConfigureAwait(false);
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        return new PlatformDto(platform.Id, platform.PlatformName, platform.CreatedAt);
+        return platform.Adapt<PlatformDto>();
     }
 }
