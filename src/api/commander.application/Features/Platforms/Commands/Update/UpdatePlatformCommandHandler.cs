@@ -24,7 +24,7 @@ public class UpdatePlatformCommandHandler(IPlatformRepository platformRepository
 
         existing.PlatformName = request.PlatformName;
         existing.CreatedAt = request.CreatedAt;
-        _ = await _unitOfWork.Repository<Platform>().UpdateAsync(existing, cancellationToken).ConfigureAwait(false);
+        _ = await _unitOfWork.PlatformRepository.UpdateAsync(request.Id, existing, cancellationToken).ConfigureAwait(false);
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return existing.Adapt<PlatformDto>();
     }

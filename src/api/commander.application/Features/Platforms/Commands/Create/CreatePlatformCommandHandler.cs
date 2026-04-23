@@ -16,7 +16,7 @@ public class CreatePlatformCommandHandler(IUnitOfWork unitOfWork)
         ArgumentNullException.ThrowIfNull(request);
 
         Platform platform = new() { PlatformName = request.PlatformName, CreatedAt = DateTime.UtcNow };
-        await _unitOfWork.Repository<Platform>().AddAsync(platform, cancellationToken).ConfigureAwait(false);
+        await _unitOfWork.PlatformRepository.CreateAsync(platform, cancellationToken).ConfigureAwait(false);
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return platform.Adapt<PlatformDto>();
     }

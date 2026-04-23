@@ -1,4 +1,5 @@
 using commander.domain.Interfaces;
+using commander.infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace commander.infrastructure.Persistence;
@@ -8,10 +9,8 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     private readonly AppDbContext _context = context;
     private IDbContextTransaction? _transaction;
 
-    public IGenericRepository<T> Repository<T>() where T : class
-    {
-        return new Repositories.GenericRepository<T>(_context);
-    }
+    public IPlatformRepository PlatformRepository { get; } = new PlatformRepository(context);
+    public ICommandRepository CommandRepository { get; } = new CommandRepository(context);
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

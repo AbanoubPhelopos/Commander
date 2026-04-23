@@ -26,7 +26,7 @@ public class UpdateCommandCommandHandler(IUnitOfWork unitOfWork, ICommandReposit
         existing.CommandLine = request.CommandLine;
         existing.PlatformId = request.PlatformId;
 
-        _ = await _unitOfWork.Repository<Command>().UpdateAsync(existing, cancellationToken).ConfigureAwait(false);
+        _ = await _unitOfWork.CommandRepository.UpdateCommandAsync(request.Id, existing, cancellationToken).ConfigureAwait(false);
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return existing.Adapt<CommandsDto>();

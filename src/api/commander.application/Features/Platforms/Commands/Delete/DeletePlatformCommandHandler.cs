@@ -19,7 +19,7 @@ public class DeletePlatformCommandHandler(IPlatformRepository platformRepository
             return false;
         }
 
-        bool deleted = await _unitOfWork.Repository<commander.domain.Entities.Platform>().DeleteAsync(request.Id, cancellationToken).ConfigureAwait(false);
+        bool deleted = await _unitOfWork.PlatformRepository.DeleteAsync(request.Id, cancellationToken).ConfigureAwait(false);
         if (deleted)
         {
             await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

@@ -20,7 +20,7 @@ public class DeleteCommandCommandHandler(IUnitOfWork unitOfWork, ICommandReposit
             return false;
         }
 
-        bool deleted = await _unitOfWork.Repository<Command>().DeleteAsync(request.Id, cancellationToken).ConfigureAwait(false);
+        bool deleted = await _unitOfWork.CommandRepository.DeleteCommandAsync(request.Id, cancellationToken).ConfigureAwait(false);
         if (deleted)
         {
             await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

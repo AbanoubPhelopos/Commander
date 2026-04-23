@@ -23,7 +23,7 @@ public class CreateCommandCommandHandler(IUnitOfWork unitOfWork)
             CreatedAt = DateTime.UtcNow
         };
 
-        await _unitOfWork.Repository<Command>().AddAsync(command, cancellationToken).ConfigureAwait(false);
+        await _unitOfWork.CommandRepository.CreateCommandAsync(command, cancellationToken).ConfigureAwait(false);
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return command.Adapt<CommandsDto>();
