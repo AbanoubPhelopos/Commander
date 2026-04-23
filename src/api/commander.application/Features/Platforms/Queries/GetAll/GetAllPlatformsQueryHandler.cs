@@ -1,4 +1,5 @@
 using commander.application.Features.Platforms.DTOs;
+using commander.domain.Common;
 using commander.domain.Entities;
 using commander.domain.Interfaces;
 using Mapster;
@@ -7,13 +8,13 @@ using MediatR;
 namespace commander.application.Features.Platforms.Queries.GetAll;
 
 public class GetAllPlatformsQueryHandler(IPlatformRepository platformRepository)
-    : IRequestHandler<GetAllPlatformsQuery, IEnumerable<PlatformDto>>
+    : IRequestHandler<GetAllPlatformsQuery, PaginatedList<PlatformDto>>
 {
     private readonly IPlatformRepository _platformRepository = platformRepository;
 
-    public async Task<IEnumerable<PlatformDto>> Handle(GetAllPlatformsQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<PlatformDto>> Handle(GetAllPlatformsQuery request, CancellationToken cancellationToken)
     {
-        IEnumerable<Platform> platforms = await _platformRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-        return platforms.Adapt<IEnumerable<PlatformDto>>();
+        PaginatedList<Platform> platforms = await _platformRepository.GetAllAsync(request.PaginationParams, cancellationToken).ConfigureAwait(false);
+        return new PaginatedList<PlatformDto>(platforms.Items.Adapt<List<PlatformDto>>(), platforms.PageIndex, platforms.PageSize, platforms.TotalCount);
     }
 }

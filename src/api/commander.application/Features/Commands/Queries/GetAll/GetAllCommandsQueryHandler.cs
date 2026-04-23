@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using commander.application.Features.Commands.Dtos;
+using commander.domain.Common;
 using commander.domain.Entities;
 using commander.domain.Interfaces;
 using Mapster;
@@ -7,13 +7,13 @@ using MediatR;
 
 namespace commander.application.Features.Commands.Queries.GetAll;
 
-public class GetAllCommandsQueryHandler(ICommandRepository commandRepository) : IRequestHandler<GetAllCommandsQuery, IEnumerable<CommandsDto>>
+public class GetAllCommandsQueryHandler(ICommandRepository commandRepository) : IRequestHandler<GetAllCommandsQuery, PaginatedList<CommandsDto>>
 {
     private readonly ICommandRepository _commandRepository = commandRepository;
 
-    public async Task<IEnumerable<CommandsDto>> Handle(GetAllCommandsQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<CommandsDto>> Handle(GetAllCommandsQuery request, CancellationToken cancellationToken)
     {
-        IEnumerable<Command> commands = await _commandRepository.GetAllCommandsAsync(cancellationToken).ConfigureAwait(false);
-        return commands.Adapt<IEnumerable<CommandsDto>>();
+        PaginatedList<Command> commands = await _commandRepository.GetAllCommandsAsync(request.PaginationParams, cancellationToken).ConfigureAwait(false);
+        return new PaginatedList<CommandsDto>(commands.Items.Adapt<List<CommandsDto>>(), commands.PageIndex, commands.PageSize, commands.TotalCount);
     }
 }
