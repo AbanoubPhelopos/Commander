@@ -80,9 +80,9 @@ public sealed class PlatformsController(IMediator mediator) : ControllerBase
     [HttpGet("{id}/commands")]
     [ProducesResponseType(typeof(PaginatedList<CommandsDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<PaginatedList<CommandsDto>>> GetCommandsForPlatform(int id, [FromQuery] PaginationParams paginationParams, CancellationToken cancellationToken)
+    public async Task<ActionResult<PaginatedList<CommandsDto>>> GetCommandsForPlatform(int id, [FromQuery] PaginationParams paginationParams, CancellationToken cancellationToken, string? search = null, string? sortBy = null, bool descending = false)
     {
-        PaginatedList<CommandsDto> commands = await _mediator.Send(new GetCommandsByPlatformIdQuery(id, paginationParams), cancellationToken).ConfigureAwait(false);
+        PaginatedList<CommandsDto> commands = await _mediator.Send(new GetCommandsByPlatformIdQuery(id, paginationParams, search, sortBy, descending), cancellationToken).ConfigureAwait(false);
         return Ok(commands);
     }
 

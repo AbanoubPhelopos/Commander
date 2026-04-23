@@ -21,9 +21,9 @@ public class CommandsController(IMediator mediator) : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(typeof(PaginatedList<CommandsDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PaginatedList<CommandsDto>>> GetCommands([FromQuery] PaginationParams paginationParams, CancellationToken cancellationToken)
+    public async Task<ActionResult<PaginatedList<CommandsDto>>> GetCommands([FromQuery] PaginationParams paginationParams, CancellationToken cancellationToken, string? search = null, string? sortBy = null, bool descending = false)
     {
-        PaginatedList<CommandsDto> commands = await _mediator.Send(new GetAllCommandsQuery(paginationParams), cancellationToken).ConfigureAwait(false);
+        PaginatedList<CommandsDto> commands = await _mediator.Send(new GetAllCommandsQuery(paginationParams, search, sortBy, descending), cancellationToken).ConfigureAwait(false);
         return Ok(commands);
     }
 
@@ -42,9 +42,9 @@ public class CommandsController(IMediator mediator) : ControllerBase
     [HttpGet("platform/{platformId}")]
     [ProducesResponseType(typeof(PaginatedList<CommandsDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<PaginatedList<CommandsDto>>> GetCommandsByPlatformId(int platformId, [FromQuery] PaginationParams paginationParams, CancellationToken cancellationToken)
+    public async Task<ActionResult<PaginatedList<CommandsDto>>> GetCommandsByPlatformId(int platformId, [FromQuery] PaginationParams paginationParams, CancellationToken cancellationToken, string? search = null, string? sortBy = null, bool descending = false)
     {
-        PaginatedList<CommandsDto> commands = await _mediator.Send(new GetCommandsByPlatformIdQuery(platformId, paginationParams), cancellationToken).ConfigureAwait(false);
+        PaginatedList<CommandsDto> commands = await _mediator.Send(new GetCommandsByPlatformIdQuery(platformId, paginationParams, search, sortBy, descending), cancellationToken).ConfigureAwait(false);
         return Ok(commands);
     }
 

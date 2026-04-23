@@ -1,6 +1,16 @@
 @baseUrl = http://localhost:5141/api/commands
 
-GET {{baseUrl}}
+GET {{baseUrl}}?pageIndex=1&pageSize=10
+Accept: application/json
+
+###
+
+GET {{baseUrl}}?pageIndex=1&pageSize=10&search=dotnet
+Accept: application/json
+
+###
+
+GET {{baseUrl}}?pageIndex=1&pageSize=10&sortBy=howto&descending=true
 Accept: application/json
 
 ###
@@ -34,6 +44,11 @@ Content-Type: application/json
 ###
 
 DELETE {{baseUrl}}/1
+Accept: application/json
+
+###
+
+GET {{baseUrl}}/platform/1?pageIndex=1&pageSize=10
 Accept: application/json
 
 ###

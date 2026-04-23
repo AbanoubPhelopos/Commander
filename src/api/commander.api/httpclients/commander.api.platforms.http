@@ -43,7 +43,7 @@ Accept: application/json
 
 ###
 
-GET {{baseUrl}}/1/commands
+GET {{baseUrl}}/1/commands?pageIndex=1&pageSize=10
 Accept: application/json
 
 ###

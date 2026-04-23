@@ -16,7 +16,7 @@ public class GetCommandsByPlatformIdQueryHandler(ICommandRepository commandRepos
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        PaginatedList<Command> commands = await _commandRepository.GetCommandsByPlatformIdAsync(request.PlatformId, request.PaginationParams, cancellationToken).ConfigureAwait(false);
+        PaginatedList<Command> commands = await _commandRepository.GetCommandsByPlatformIdAsync(request.PlatformId, request.PaginationParams, request.Search, request.SortBy, request.Descending, cancellationToken).ConfigureAwait(false);
         return new PaginatedList<CommandsDto>(commands.Items.Adapt<List<CommandsDto>>(), commands.PageIndex, commands.PageSize, commands.TotalCount);
     }
 }
