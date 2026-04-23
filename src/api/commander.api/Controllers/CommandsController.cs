@@ -5,6 +5,7 @@ using commander.application.Features.Commands.Dtos;
 using commander.application.Features.Commands.Queries.GetAll;
 using commander.application.Features.Commands.Queries.GetById;
 using commander.application.Features.Commands.Queries.GetByPlatformId;
+using commander.domain.Common;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,10 +20,10 @@ public class CommandsController(IMediator mediator) : ControllerBase
     private readonly IMediator _mediator = mediator;
 
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<CommandsDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<CommandsDto>>> GetCommands(CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(PaginatedList<CommandsDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PaginatedList<CommandsDto>>> GetCommands([FromQuery] PaginationParams paginationParams, CancellationToken cancellationToken)
     {
-        IEnumerable<CommandsDto> commands = await _mediator.Send(new GetAllCommandsQuery(), cancellationToken).ConfigureAwait(false);
+        PaginatedList<CommandsDto> commands = await _mediator.Send(new GetAllCommandsQuery(paginationParams), cancellationToken).ConfigureAwait(false);
         return Ok(commands);
     }
 
@@ -39,11 +40,11 @@ public class CommandsController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("platform/{platformId}")]
-    [ProducesResponseType(typeof(IEnumerable<CommandsDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PaginatedList<CommandsDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IEnumerable<CommandsDto>>> GetCommandsByPlatformId(int platformId, CancellationToken cancellationToken)
+    public async Task<ActionResult<PaginatedList<CommandsDto>>> GetCommandsByPlatformId(int platformId, [FromQuery] PaginationParams paginationParams, CancellationToken cancellationToken)
     {
-        IEnumerable<CommandsDto> commands = await _mediator.Send(new GetCommandsByPlatformIdQuery(platformId), cancellationToken).ConfigureAwait(false);
+        PaginatedList<CommandsDto> commands = await _mediator.Send(new GetCommandsByPlatformIdQuery(platformId, paginationParams), cancellationToken).ConfigureAwait(false);
         return Ok(commands);
     }
 

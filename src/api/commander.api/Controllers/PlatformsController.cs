@@ -1,9 +1,12 @@
+using commander.application.Features.Commands.Dtos;
+using commander.application.Features.Commands.Queries.GetByPlatformId;
 using commander.application.Features.Platforms.Commands.Create;
 using commander.application.Features.Platforms.Commands.Delete;
 using commander.application.Features.Platforms.Commands.Update;
 using commander.application.Features.Platforms.DTOs;
 using commander.application.Features.Platforms.Queries.GetAll;
 using commander.application.Features.Platforms.Queries.GetById;
+using commander.domain.Common;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,10 +21,10 @@ public sealed class PlatformsController(IMediator mediator) : ControllerBase
     private readonly IMediator _mediator = mediator;
 
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<PlatformDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<PlatformDto>>> GetPlatforms(CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(PaginatedList<PlatformDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PaginatedList<PlatformDto>>> GetPlatforms([FromQuery] PaginationParams paginationParams, CancellationToken cancellationToken)
     {
-        IEnumerable<PlatformDto> platforms = await _mediator.Send(new GetAllPlatformsQuery(), cancellationToken).ConfigureAwait(false);
+        PaginatedList<PlatformDto> platforms = await _mediator.Send(new GetAllPlatformsQuery(paginationParams), cancellationToken).ConfigureAwait(false);
         return Ok(platforms);
     }
 
@@ -73,4 +76,14 @@ public sealed class PlatformsController(IMediator mediator) : ControllerBase
             ? NotFound(new ProblemDetails { Status = 404, Title = "Platform not found", Detail = $"Platform with ID {id} not found." })
             : NoContent();
     }
+
+    [HttpGet("{id}/commands")]
+    [ProducesResponseType(typeof(PaginatedList<CommandsDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PaginatedList<CommandsDto>>> GetCommandsForPlatform(int id, [FromQuery] PaginationParams paginationParams, CancellationToken cancellationToken)
+    {
+        PaginatedList<CommandsDto> commands = await _mediator.Send(new GetCommandsByPlatformIdQuery(id, paginationParams), cancellationToken).ConfigureAwait(false);
+        return Ok(commands);
+    }
+
 }

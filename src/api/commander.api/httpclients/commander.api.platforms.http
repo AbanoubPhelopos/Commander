@@ -30,3 +30,11 @@ Content-Type: application/json
 
 DELETE {{baseUrl}}/1
 Accept: application/json
+
+###
+
+GET {{baseUrl}}/1/commands
+Accept: application/json
+
+###
+

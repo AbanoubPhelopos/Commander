@@ -8,10 +8,6 @@ Accept: application/json
 GET {{baseUrl}}/1
 Accept: application/json
 
-###
-
-GET {{baseUrl}}/platform/1
-Accept: application/json
 
 ###
 
