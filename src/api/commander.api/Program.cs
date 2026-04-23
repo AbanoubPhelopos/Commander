@@ -1,6 +1,7 @@
 using Commander.Api.Registrations;
 using commander.application.Features.Platforms.Commands.Create;
 using commander.application.Features.Platforms.Queries.GetAll;
+using commander.api.Middleware;
 
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 
