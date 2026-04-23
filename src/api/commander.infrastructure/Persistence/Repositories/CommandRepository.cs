@@ -1,3 +1,4 @@
+using commander.domain.Common;
 using commander.domain.Entities;
 using commander.domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -15,18 +16,19 @@ public class CommandRepository(AppDbContext context) : ICommandRepository
             .FirstOrDefaultAsync(c => c.Id == id, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<IEnumerable<Command>> GetAllCommandsAsync(CancellationToken cancellationToken = default)
+    public async Task<PaginatedList<Command>> GetAllCommandsAsync(PaginationParams paginationParams, CancellationToken cancellationToken = default)
     {
         return await _context.Commands
             .Include(c => c.Platform)
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
+            .ToPaginatedListAsync(paginationParams, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<IEnumerable<Command>> GetCommandsByPlatformIdAsync(int platformId, CancellationToken cancellationToken = default)
+    public async Task<PaginatedList<Command>> GetCommandsByPlatformIdAsync(int platformId, PaginationParams paginationParams, CancellationToken cancellationToken = default)
     {
         return await _context.Commands
             .Include(c => c.Platform)
-            .Where(c => c.PlatformId == platformId).ToListAsync(cancellationToken).ConfigureAwait(false);
+            .Where(c => c.PlatformId == platformId)
+            .ToPaginatedListAsync(paginationParams, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<Command> CreateCommandAsync(Command command, CancellationToken cancellationToken = default)

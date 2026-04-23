@@ -1,3 +1,4 @@
+using commander.domain.Common;
 using commander.domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,9 +13,9 @@ public class GenericRepository<T>(AppDbContext context) : IGenericRepository<T> 
         return await Context.Set<T>().FindAsync([id], cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<PaginatedList<T>> GetAllAsync(PaginationParams paginationParams, CancellationToken cancellationToken = default)
     {
-        return await Context.Set<T>().ToListAsync(cancellationToken).ConfigureAwait(false);
+        return await Context.Set<T>().ToPaginatedListAsync(paginationParams, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)

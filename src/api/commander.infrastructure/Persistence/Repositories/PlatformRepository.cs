@@ -1,3 +1,4 @@
+using commander.domain.Common;
 using commander.domain.Entities;
 using commander.domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -19,9 +20,9 @@ public class PlatformRepository(AppDbContext context) : IPlatformRepository
                     .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<IEnumerable<Platform>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<PaginatedList<Platform>> GetAllAsync(PaginationParams paginationParams, CancellationToken cancellationToken = default)
     {
-        return await _context.Platforms.ToListAsync(cancellationToken).ConfigureAwait(false);
+        return await _context.Platforms.ToPaginatedListAsync(paginationParams, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<Platform> CreateAsync(Platform platform, CancellationToken cancellationToken = default)
