@@ -1,6 +1,16 @@
 @baseUrl = http://localhost:5141/api/platforms
 
-GET {{baseUrl}}
+GET {{baseUrl}}?pageIndex=1&pageSize=10
+Accept: application/json
+
+###
+
+GET {{baseUrl}}?pageIndex=1&pageSize=10&search=Xbox
+Accept: application/json
+
+###
+
+GET {{baseUrl}}?pageIndex=1&pageSize=10&sortBy=platformname&descending=true
 Accept: application/json
 
 ###

@@ -20,9 +20,28 @@ public class PlatformRepository(AppDbContext context) : IPlatformRepository
                     .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<PaginatedList<Platform>> GetAllAsync(PaginationParams paginationParams, CancellationToken cancellationToken = default)
+    public async Task<PaginatedList<Platform>> GetAllAsync(PaginationParams paginationParams, string? search = null, string? sortBy = null, bool descending = false, CancellationToken cancellationToken = default)
     {
-        return await _context.Platforms.ToPaginatedListAsync(paginationParams, cancellationToken).ConfigureAwait(false);
+        IQueryable<Platform> query = _context.Platforms;
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(p => p.PlatformName.Contains(search));
+        }
+
+        query = ApplySorting(query, sortBy, descending);
+
+        return await query.ToPaginatedListAsync(paginationParams, cancellationToken).ConfigureAwait(false);
+    }
+
+    private static IQueryable<Platform> ApplySorting(IQueryable<Platform> query, string? sortBy, bool descending)
+    {
+        return sortBy?.ToUpperInvariant() switch
+        {
+            "PLATFORMNAME" => descending ? query.OrderByDescending(p => p.PlatformName) : query.OrderBy(p => p.PlatformName),
+            "CREATEDAT" => descending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt),
+            _ => descending ? query.OrderByDescending(p => p.Id) : query.OrderBy(p => p.Id)
+        };
     }
 
     public async Task<Platform> CreateAsync(Platform platform, CancellationToken cancellationToken = default)

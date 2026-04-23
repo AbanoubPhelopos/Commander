@@ -22,9 +22,9 @@ public sealed class PlatformsController(IMediator mediator) : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(typeof(PaginatedList<PlatformDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PaginatedList<PlatformDto>>> GetPlatforms([FromQuery] PaginationParams paginationParams, CancellationToken cancellationToken)
+    public async Task<ActionResult<PaginatedList<PlatformDto>>> GetPlatforms([FromQuery] PaginationParams paginationParams, CancellationToken cancellationToken, string? search = null, string? sortBy = null, bool descending = false)
     {
-        PaginatedList<PlatformDto> platforms = await _mediator.Send(new GetAllPlatformsQuery(paginationParams), cancellationToken).ConfigureAwait(false);
+        PaginatedList<PlatformDto> platforms = await _mediator.Send(new GetAllPlatformsQuery(paginationParams, search, sortBy, descending), cancellationToken).ConfigureAwait(false);
         return Ok(platforms);
     }
 

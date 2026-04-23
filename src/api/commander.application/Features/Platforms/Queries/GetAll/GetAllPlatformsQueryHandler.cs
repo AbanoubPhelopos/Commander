@@ -14,7 +14,7 @@ public class GetAllPlatformsQueryHandler(IPlatformRepository platformRepository)
 
     public async Task<PaginatedList<PlatformDto>> Handle(GetAllPlatformsQuery request, CancellationToken cancellationToken)
     {
-        PaginatedList<Platform> platforms = await _platformRepository.GetAllAsync(request.PaginationParams, cancellationToken).ConfigureAwait(false);
+        PaginatedList<Platform> platforms = await _platformRepository.GetAllAsync(request.PaginationParams, request.Search, request.SortBy, request.Descending, cancellationToken).ConfigureAwait(false);
         return new PaginatedList<PlatformDto>(platforms.Items.Adapt<List<PlatformDto>>(), platforms.PageIndex, platforms.PageSize, platforms.TotalCount);
     }
 }
