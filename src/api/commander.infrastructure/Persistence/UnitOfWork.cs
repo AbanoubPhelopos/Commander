@@ -1,24 +1,28 @@
 using commander.domain.Interfaces;
-using commander.infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
 
 namespace commander.infrastructure.Persistence;
 
-public class UnitOfWork(AppDbContext context) : IUnitOfWork
+public class UnitOfWork(AppDbContext context, IPlatformRepository platformRepository, ICommandRepository commandRepository, ILogger<UnitOfWork> logger) : IUnitOfWork
 {
     private readonly AppDbContext _context = context;
+    private readonly ILogger<UnitOfWork> _logger = logger;
     private IDbContextTransaction? _transaction;
 
-    public IPlatformRepository PlatformRepository { get; } = new PlatformRepository(context);
-    public ICommandRepository CommandRepository { get; } = new CommandRepository(context);
+    public IPlatformRepository PlatformRepository { get; } = platformRepository;
+    public ICommandRepository CommandRepository { get; } = commandRepository;
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        int result = await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        _logger.LogDebug("Saved {Count} changes to database", result);
+        return result;
     }
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Beginning database transaction");
         _transaction = await _context.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 
@@ -26,6 +30,7 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     {
         if (_transaction is not null)
         {
+            _logger.LogInformation("Committing database transaction");
             await _transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             await _transaction.DisposeAsync().ConfigureAwait(false);
             _transaction = null;
@@ -36,6 +41,7 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     {
         if (_transaction is not null)
         {
+            _logger.LogWarning("Rolling back database transaction");
             await _transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
             await _transaction.DisposeAsync().ConfigureAwait(false);
             _transaction = null;

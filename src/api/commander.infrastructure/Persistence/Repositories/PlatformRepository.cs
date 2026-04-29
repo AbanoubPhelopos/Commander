@@ -2,26 +2,32 @@ using commander.domain.Common;
 using commander.domain.Entities;
 using commander.domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace commander.infrastructure.Persistence.Repositories;
 
-public class PlatformRepository(AppDbContext context) : IPlatformRepository
+public class PlatformRepository(AppDbContext context, ILogger<PlatformRepository> logger) : IPlatformRepository
 {
     private readonly AppDbContext _context = context;
+    private readonly ILogger<PlatformRepository> _logger = logger;
 
     public async Task<Platform?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
+        _logger.LogDebug("Fetching platform by Id: {PlatformId}", id);
         return await _context.Platforms.FindAsync([id], cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<string?> GetPlatformNameByIdAsync(int id, CancellationToken cancellationToken = default)
     {
+        _logger.LogDebug("Fetching platform name by Id: {PlatformId}", id);
         return await _context.Platforms.Where(p => p.Id == id).Select(p => p.PlatformName)
                     .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<PaginatedList<Platform>> GetAllAsync(PaginationParams paginationParams, string? search = null, string? sortBy = null, bool descending = false, CancellationToken cancellationToken = default)
     {
+        _logger.LogDebug("Fetching all platforms with Page: {PageIndex}, Search: {Search}, SortBy: {SortBy}", paginationParams.PageIndex, search, sortBy);
+
         IQueryable<Platform> query = _context.Platforms;
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -46,6 +52,7 @@ public class PlatformRepository(AppDbContext context) : IPlatformRepository
 
     public async Task<Platform> CreateAsync(Platform platform, CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Creating platform with name: {PlatformName}", platform.PlatformName);
         await _context.Platforms.AddAsync(platform, cancellationToken).ConfigureAwait(false);
         return platform;
     }
@@ -54,9 +61,12 @@ public class PlatformRepository(AppDbContext context) : IPlatformRepository
     {
         ArgumentNullException.ThrowIfNull(platform);
 
+        _logger.LogInformation("Updating platform with Id: {PlatformId}", id);
+
         Platform? existing = await _context.Platforms.FindAsync([id], cancellationToken).ConfigureAwait(false);
         if (existing is null)
         {
+            _logger.LogWarning("Platform with Id: {PlatformId} not found for update", id);
             return null;
         }
 
@@ -67,9 +77,12 @@ public class PlatformRepository(AppDbContext context) : IPlatformRepository
 
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Deleting platform with Id: {PlatformId}", id);
+
         Platform? entity = await _context.Platforms.FindAsync([id], cancellationToken).ConfigureAwait(false);
         if (entity is null)
         {
+            _logger.LogWarning("Platform with Id: {PlatformId} not found for deletion", id);
             return false;
         }
 
