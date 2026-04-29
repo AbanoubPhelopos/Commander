@@ -1,27 +1,34 @@
 @baseUrl = http://localhost:5141/api/platforms
 
+@apiKey = <your-generated-api-key-here>
+
 GET {{baseUrl}}?pageIndex=1&pageSize=10
+x-api-key: {{apiKey}}
 Accept: application/json
 
 ###
 
 GET {{baseUrl}}?pageIndex=1&pageSize=10&search=Xbox
+x-api-key: {{apiKey}}
 Accept: application/json
 
 ###
 
 GET {{baseUrl}}?pageIndex=1&pageSize=10&sortBy=platformname&descending=true
+x-api-key: {{apiKey}}
 Accept: application/json
 
 ###
 
 GET {{baseUrl}}/1
+x-api-key: {{apiKey}}
 Accept: application/json
 
 ###
 
 POST {{baseUrl}}
 Content-Type: application/json
+x-api-key: {{apiKey}}
 
 {
     "platformName": "Xbox"
@@ -31,6 +38,7 @@ Content-Type: application/json
 
 PUT {{baseUrl}}/1
 Content-Type: application/json
+x-api-key: {{apiKey}}
 
 {
     "platformName": "Xbox 2"
@@ -39,11 +47,13 @@ Content-Type: application/json
 ###
 
 DELETE {{baseUrl}}/1
+x-api-key: {{apiKey}}
 Accept: application/json
 
 ###
 
 GET {{baseUrl}}/1/commands?pageIndex=1&pageSize=10
+x-api-key: {{apiKey}}
 Accept: application/json
 
 ###

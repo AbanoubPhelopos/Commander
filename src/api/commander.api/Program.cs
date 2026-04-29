@@ -2,6 +2,7 @@ using Commander.Api.Registrations;
 using commander.application.Features.Platforms.Commands.Create;
 using commander.application.Features.Platforms.Queries.GetAll;
 using commander.api.Middleware;
+using Microsoft.AspNetCore.Authentication;
 using Serilog;
 
 
@@ -21,6 +22,13 @@ builder.Services.AddMediatR(cfg =>
 
 builder.Services.AddDependencies(builder.Configuration);
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = "ApiKey";
+    options.DefaultChallengeScheme = "ApiKey";
+})
+.AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
+
 WebApplication app = builder.Build();
 
 
@@ -34,6 +42,7 @@ app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
