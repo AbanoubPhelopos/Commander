@@ -52,6 +52,44 @@ namespace commander.infrastructure.Persistence.Migrations
                     b.ToTable("Commands");
                 });
 
+            modelBuilder.Entity("commander.domain.Entities.KeyRegistration", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<string>("KeyHash")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid>("KeyIndex")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("Salt")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KeyIndex")
+                        .IsUnique()
+                        .HasDatabaseName("Index_KeyRegistration_KeyIndex");
+
+                    b.ToTable("KeyRegistrations");
+                });
+
             modelBuilder.Entity("commander.domain.Entities.Platform", b =>
                 {
                     b.Property<int>("Id")

@@ -1,4 +1,5 @@
 using commander.application.Features.Commands.Mappings;
+using commander.application.Features.KeyRegistrations.Validators;
 using commander.application.Features.Platforms.Commands.Create;
 using commander.application.Features.Platforms.Commands.Update;
 using commander.application.Features.Platforms.Mappings;
@@ -24,9 +25,11 @@ internal static class Dependencies
 
         services.AddScoped<IPlatformRepository, PlatformRepository>();
         services.AddScoped<ICommandRepository, CommandRepository>();
+        services.AddScoped<IKeyRegistrationRepository, KeyRegistrationRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddValidatorsFromAssemblyContaining<CreatePlatformCommandValidator>();
+        services.AddValidatorsFromAssemblyContaining<KeyRegistrationCreateDtoValidator>();
         TypeAdapterConfig.GlobalSettings.Default.NameMatchingStrategy(NameMatchingStrategy.IgnoreCase);
 
         CommandMappingProfile commandProfile = new();

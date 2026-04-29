@@ -9,6 +9,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Platform> Platforms { get; set; }
     public DbSet<Command> Commands { get; set; }
+    public DbSet<KeyRegistration> KeyRegistrations { get; set; }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
@@ -36,5 +37,33 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Command>()
             .HasIndex(c => c.PlatformId)
             .HasDatabaseName("Index_Command_PlatformId");
+
+        modelBuilder.Entity<KeyRegistration>(entity =>
+        {
+            entity.HasKey(k => k.Id);
+
+            entity.Property(k => k.KeyIndex)
+                .IsRequired();
+
+            entity.Property(k => k.Salt)
+                .IsRequired();
+
+            entity.Property(k => k.KeyHash)
+                .IsRequired()
+                .HasMaxLength(500);
+
+            entity.Property(k => k.Description)
+                .IsRequired()
+                .HasMaxLength(250);
+
+            entity.Property(k => k.UserId)
+                .IsRequired()
+                .HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<KeyRegistration>()
+            .HasIndex(k => k.KeyIndex)
+            .IsUnique()
+            .HasDatabaseName("Index_KeyRegistration_KeyIndex");
     }
 }
