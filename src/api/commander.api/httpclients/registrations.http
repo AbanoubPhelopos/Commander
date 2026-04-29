@@ -1,0 +1,13 @@
+@baseUrl = http://localhost:5141/api/registrations
+@apiKey = <your-generated-api-key-here>
+
+# Register a new API key
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+    "userId": "hardcode until we have OAuth",
+    "description": "from requests"
+}
+
+###
